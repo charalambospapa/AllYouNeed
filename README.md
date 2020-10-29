@@ -1,5 +1,5 @@
 # AllYouNeed
 
-## Project description
+## Project description description
 
 ## Installing the project requirements
