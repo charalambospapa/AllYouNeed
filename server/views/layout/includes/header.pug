@@ -1,0 +1,35 @@
+.topmenu
+  ul
+    li
+      a(href='/products')
+        img(src='../images/AYN/logo2.png')
+        |  HOME
+    .dropdown
+      li
+        a(href='#') SORT
+        .dropmenu
+          ul
+            li
+              a(href='/products/byascprice') LOWEST PRICE 
+            li
+              a(href='/products/bydescprice') HIGHEST PRICE 
+            li
+              a(href='/products/bycategory') CATEGORY
+            li
+              a(href='/products/endingsoonest') ENDING SOONEST
+            li
+              a(href='/products/endinglatest') ENDING LATEST
+    .searchli
+      li
+        a(href='#')
+          span SEARCH
+          #query.searchbox
+            label
+              form(action='/products/search', method='post')
+                input(type='text' name='search' placeholder='for a product or user (⏎)' required=true)
+                //input(type='submit' value="GO")
+    li.right
+      if loggedin
+        a(href='/account') MY ACCOUNT
+      else
+        a(href='/login') LOGIN

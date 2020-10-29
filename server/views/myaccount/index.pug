@@ -1,0 +1,299 @@
+extends ../layout/index
+
+block content
+  .innerbody
+    .spacer
+    .acc
+      .cont
+        .tab
+          ul.inbox           
+            if received.length==0
+              |You haven't received any messages yet! 
+            each message in received
+              li
+                if message.seen==true
+                  h5=`${message.sender} at ${message.date} `
+                else 
+                  h5=`${message.sender} at ${message.date} `
+                p=message.content
+        .tab
+          ul.outbox
+            if sent.length==0
+                |You haven't sent any messages yet!
+            each message in sent
+              li
+                if message.seen==true
+                  h5=`${message.receiver} at ${message.date} ✔`
+                else 
+                  h5=`${message.receiver} at ${message.date} ○`
+
+                p=message.content
+        .tab
+          #recepient.message
+            form(action='/account',method="POST")
+                .custom-select
+                  .form-group
+                    select#recepient(name="recepient")
+                      option(disable selected value) Recepient&nbsp;&nbsp;
+                      each c in contacts
+                        option(value=`${c}`) #{c}
+                //input(type='text', name='recepient', placeholder='Recepient' required=true)
+                input(type='submit', value='➤', name='Submit')
+                textarea(type='text', name='message', placeholder='Your message here ...', rows='8' required=true)
+              
+        .tab
+          ul
+            li First Name: #{details.firstname}
+            li Last Name: #{details.lastname}
+            li User type: #{details.type}
+            li E-mail: #{details.email}
+            li Address: #{details.address}
+            li Country: #{details.country}
+            li Taxpayer ID: #{details.taxpayerid}
+            li Phone: #{details.phone}
+            li Gender: #{details.gender}
+            if details.type=="Seller"
+              li Rating as seller: #{details.rating.srating.toFixed(1)}
+              li Rating as bidder: #{details.rating.brating.toFixed(1)}
+            else if details.type=="Bidder"
+              li Rating: #{details.rating.brating.toFixed(1)}
+        .tab#target
+          form.change-form(action="/account",method="POST")
+            .form-group
+              input(type='text' required=true name='fname' placholder="First Name" value=`${details.firstname}`)
+            .form-group
+              input(type='text' required=true name='lname' placholder="Last Name" value=`${details.lastname}`)
+            .form-group
+              input(type='number' required=true name='phone' placholder="Telephone" value=`${details.phone}`)
+            .form-group
+              input(type='text' required=true name='address' placholder="Address"  value=`${details.address}`)
+            .custom-select
+              .form-group
+                select#gender(name="country")
+                  option(value=`${details.gender}`) #{details.country}
+                  option(value='Greece') Greece
+                  option(value='Cyprus') Cyprus
+                  option(value='Other') Other
+            .form-group
+              input(type='number' required=true name='taxid' placholder="Taxpayer ID" value=`${details.taxpayerid}`)
+            .form-group
+              input(type='email' required=true name='email' placholder="E-mail" value=`${details.email}`)
+            .custom-select
+              .form-group
+                select#gender(name ="gender" )
+                  option( value=`${details.gender}`) #{details.gender}
+                  option(value='Male') Male
+                  option(value='Female') Female
+                  option(value='Other') Other
+            .form-group
+              input(type='password' name='oldpass' placeholder=`Old Password` required=true)
+            .form-group
+              input(type='password' name='pass' placeholder=`New Password (Optional)`)
+            br
+            .form-group
+              input.subm(type='submit' name='submit') 
+            //button.btn.btn-default.pull-right(type='submit') Submit
+        if details.type=="Seller"
+          .tab
+            ul
+              li
+                strong
+                  a(href='/createauction') Create New Auction
+              each product in myproducts
+                li
+                  if now>product.start_date && now<product.end_date
+                    a(href='/products/'+`${product.shortname}`) #{product.name}  
+                    span active
+                  else
+                    if now>product.end_date
+                      a(href='/products/'+`${product.shortname}`) #{product.name}  
+                      span finished
+                    if now<product.start_date
+                      a(href='/products/'+`${product.shortname}`) #{product.name}  inactive - 
+                      form(action='/account' ,method='post')
+                        input(type='hidden',value=`${product.shortname}` name='activateshortname')
+                        input(type='submit',value='Activate Now')
+                        //EDIT THIS AUCTION
+
+        if details.type!='admin'
+          .tab
+            ul
+              each product in boughtbyme
+                li
+                  if now>product.end_date
+                    a(href='/products/'+`${product.shortname}`) #{product.name}  
+                    span finished
+                  if now>product.start_date && now<product.end_date
+              
+        
+                      
+
+        //items i've bid but not finished?
+        if(details.type=='admin')
+          .tab
+            ul
+              each user in all
+                if(user.type=='admin')
+                  - continue
+                if(user.isaccepted==false)
+                  li
+                    | #{user.firstname} #{user.lastname} #{user.gender} #{user.email} #{user.phone} #{user.address} #{user.type} #{user.taxpayerid}
+                    a(href=`/account/accept/${user.email}`) &#xFF0B;
+                    a(href=`/account/reject/${user.email}`) &#xFF0D;
+                else
+                  li 
+                    | #{user.firstname} #{user.lastname} #{user.gender} #{user.email} #{user.phone} #{user.address} #{user.type} #{user.taxpayerid}
+
+            
+      //
+            -
+      .tabs
+        ul
+          a(href='#' onclick='tab(1)')
+            li.men
+              br
+              | INBOX
+          a(href='#' onclick='tab(2)')
+            li.men
+              br
+              | OUTBOX
+          a(href='#' onclick='tab(3)')
+            li.men
+              br
+              | NEW MESSAGE
+          a(href='#' onclick='tab(4)')
+            li.men
+              br
+              | ACCOUNT INFO
+          a(onclick='tab(5)')
+            li.men
+              br
+              | CHANGE INFO
+          if details.type=='Seller'
+            a(onclick='tab(6)')
+              li.men
+                br
+                | MY PRODUCTS
+          if details.type=='Seller'
+            a(onclick='tab(7)')
+              li.men
+                br
+                | WON BY ME
+          else if details.type=='Bidder'
+            a(onclick='tab(6)')
+              li.men
+                br
+                | WON BY ME
+          if(details.type=='admin')
+            a(href='#' onclick='tab(6)')
+              li.men
+                br
+                | MEMBER REQUESTS
+            a(href='/database/files')
+              li.men
+                br
+                | EXPORT DATA
+    .logout
+        form.logout-form(action="/account",method="POST")
+          input(type='submit' value='LOG OUT' name='LOG OUT')
+  .footer
+    span
+      a.a1(href='/TOS') TERMS OF SERVICE
+    span
+      a.a1(href='/aboutus') OUR TEAM
+    br
+    span
+      | Created by Charalampos Papa, Chrysostomos Rampidis and Charalampos Evagelatos, 2019. All rights reserved. For questions or additional information, 
+      a.a2(href='mailto:alallyouneed@gmail.com') contact us
+  script(type='text/javascript').
+    var Index = 1;
+    showtab(Index);
+    function tab(n) {
+    showtab(Index = n);
+    }
+    function showtab(n) {
+    var i;
+    var tabs = document.getElementsByClassName("tab");
+    var men = document.getElementsByClassName("men");
+    if (n > tabs.length) {Index = 1}
+    if (n < 1) {Index = tabs.length}
+    for (i = 0; i < tabs.length; i++) {
+    tabs[i].className = tabs[i].className.replace(" actv", "");
+    men[i].className = men[i].className.replace(" bg", "");
+    }
+    tabs[Index-1].className += " actv";
+    men[Index-1].className += " bg";
+    }
+  script.
+    var x, i, j, selElmnt, a, b, c;
+    /*look for any elements with the class "custom-select":*/
+    x = document.getElementsByClassName("custom-select");
+    for (i = 0; i < x.length; i++) {
+    selElmnt = x[i].getElementsByTagName("select")[0];
+    /*for each element, create a new DIV that will act as the selected item:*/
+    a = document.createElement("DIV");
+    a.setAttribute("class", "select-selected");
+    a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
+    x[i].appendChild(a);
+    /*for each element, create a new DIV that will contain the option list:*/
+    b = document.createElement("DIV");
+    b.setAttribute("class", "select-items select-hide");
+    for (j = 1; j < selElmnt.length; j++) {
+    /*for each option in the original select element,
+    create a new DIV that will act as an option item:*/
+    c = document.createElement("DIV");
+    c.innerHTML = selElmnt.options[j].innerHTML;
+    c.addEventListener("click", function(e) {
+    /*when an item is clicked, update the original select box,
+    and the selected item:*/
+    var y, i, k, s, h;
+    s = this.parentNode.parentNode.getElementsByTagName("select")[0];
+    h = this.parentNode.previousSibling;
+    for (i = 0; i < s.length; i++) {
+    if (s.options[i].innerHTML == this.innerHTML) {
+    s.selectedIndex = i;
+    h.innerHTML = this.innerHTML;
+    y = this.parentNode.getElementsByClassName("same-as-selected");
+    for (k = 0; k < y.length; k++) {
+    y[k].removeAttribute("class");
+    }
+    this.setAttribute("class", "same-as-selected");
+    break;
+    }
+    }
+    h.click();
+    });
+    b.appendChild(c);
+    }
+    x[i].appendChild(b);
+    a.addEventListener("click", function(e) {
+    /*when the select box is clicked, close any other select boxes,
+    and open/close the current select box:*/
+    e.stopPropagation();
+    closeAllSelect(this);
+    this.nextSibling.classList.toggle("select-hide");
+    this.classList.toggle("select-arrow-active");
+    });
+    }
+    function closeAllSelect(elmnt) {
+    /*a function that will close all select boxes in the document,
+    except the current select box:*/
+    var x, y, i, arrNo = [];
+    x = document.getElementsByClassName("select-items");
+    y = document.getElementsByClassName("select-selected");
+    for (i = 0; i < y.length; i++) {
+    if (elmnt == y[i]) {
+    arrNo.push(i)
+    } else {
+    y[i].classList.remove("select-arrow-active");
+    }
+    }
+    for (i = 0; i < x.length; i++) {
+    if (arrNo.indexOf(i)) {
+    x[i].classList.add("select-hide");
+    }
+    }
+    }
+    /*if the user clicks anywhere outside the select box,
+    then close all select boxes:*/
+    document.addEventListener("click", closeAllSelect);

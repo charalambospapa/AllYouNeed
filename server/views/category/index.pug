@@ -1,0 +1,59 @@
+extends ../layout/index.pug
+block content
+    .innerbody
+        .spacer
+        if categories == null
+            .category
+                .anchor
+                    .placer 
+                        form(action='/products/bycategory', method='post')
+                            input(class='catname' value="No Sub-Categories")
+                            //maybe need to change this? Labis?
+        else
+            each c in categories            
+                .category
+                    .anchor
+                        .placer
+                            form(action='/products/bycategory', method='post')
+                                input(class='catname' type='submit',value=`${c}`,name="choice")
+                                input(type='hidden',value=`${history}`,name="history")    
+                    if products[c].length==0
+                            .noitems
+                                h3="No Items - Yet !"
+                        
+                    else
+                        each p in products[c]   
+                            .auctionpreview(style={cursor: 'pointer'} onclick=`location.href='${p.shortname}';`)
+                                .headbox
+                                    .vertcenter
+                                        h3=`${p.name}`
+                                .pricediv
+                                    .price
+                                        .fullcenter
+                                            if p.bids.length==0
+                                                h4=p.starting_bid.toFixed(2)
+                                            else
+                                                h4=p.bids[p.bids.length-1].amount.toFixed(2)
+                                .auctionpreviewthumb
+                                    img(src=`../images/${p.shortname}/${p.shortname}_1.jpg`)
+                                p
+                                    | #{p.description}
+
+    .footer
+        span
+        a.a1(href='/TOS') TERMS OF SERVICE
+        span
+        a.a1(href='/aboutus') OUR TEAM
+        br
+        span
+        | Created by Charalampos Papa, Chrysostomos Rampidis and Charalampos Evagelatos, 2019. All rights reserved. For questions or additional information, 
+        a.a2(href='mailto:alallyouneed@gmail.com') contact us
+
+    script.
+        const cnames = document.querySelectorAll(".catname");
+        cnames.forEach((cname) => {
+            var anchor = document.querySelector(".anchor");
+            cname.style.width = getComputedStyle(anchor).height;
+        });
+        
+        

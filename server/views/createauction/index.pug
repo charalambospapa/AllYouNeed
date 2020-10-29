@@ -1,0 +1,121 @@
+extends ../layout/index.pug
+
+block content
+  .innerbody
+    .spacer
+    .auction
+      form(style="font-size : 0px ; display: flex;" action='/createauction', enctype='multipart/form-data', method='post' id="createauctionform")
+        .crau-left
+          .imgbox2
+            .imgprev
+              img#fill(src='#',onclick="document.getElementById('selectedFile').click();", alt='Please insert at least one image', onerror="this.src='images/AYN/image-missing.png'")
+              img#fill2.smallimg(src='images/AYN/alt.jpg', alt='')
+              img#fill3.smallimg(src='images/AYN/alt.jpg', alt='')
+              img#fill4.smallimg(src='images/AYN/alt.jpg', alt='')
+            .bot
+              input#selectedFile(type='file', name='photo',style='display: none;',multiple=true, onchange='loadFile(event)',required=true)
+              p
+                |Every auction item must have at least one image, but we recommend adding more (the maximum is 4). To do that, click above, and select multiple images in the pop-up. Want to start over? Just press clear !
+              input.button#clr(type='button', value='Clear', onclick='document.getElementById("selectedFile").value = "";var image=document.getElementById("fill");image.src="#";var image2=document.getElementById("fill2");image2.src="#";var image3=document.getElementById("fill3");image3.src="#";var image4=document.getElementById("fill4");image4.src="#";')
+        .crau-right
+          .crauerror#error_crau
+            |
+          .databox
+            
+            input.next(type='text', placeholder='Product Name',name="name",required=true,onsubmit='return false')
+            br
+            input.mod(type="number",placeholder="Starting Bid",name="starting_bid",required=true,step='0.01',min='0.01')
+            input.mod(type="number",placeholder="Buy it now Price ",name="buy_price",step='0.01',min='0.01')
+            br
+            span
+              |Starting Date 
+            input.mod(type='datetime-local', name='start_date',placeholder="Starting Bid" required=true)   
+            br
+            span
+              |Ending Date &nbsp;
+            input.mod(type='datetime-local', name='end_date', required=true)
+            
+            label
+              textarea(type='text', name='description', placeholder='Description', maxlength='250', rows='5')
+            //select(style="width : 20vw ;" form="createauctionform" name='category', required=true, multiple) 
+            //  option(disable selected value) Category
+            //  each cat in categories
+            //    option(value=`${cat.name}`) #{cat.name}
+            .checkbox
+              each cat,i in categories
+                input(type="checkbox" name="categories" value=`${cat.name}` id=`${cat.name}`)
+                label(class="opt" for=`${cat.name}`)
+                  |#{cat.name}
+            
+            br
+            input.next(type="text",placeholder="Location",name="location",required=true)   
+
+            
+            input(type="submit",value="Submit")
+          
+
+            
+  .footer
+    span
+      a.a1(href='/TOS') TERMS OF SERVICE
+    span
+      a.a1(href='/aboutus') OUR TEAM
+    br
+    span
+      | Created by Charalampos Papa, Chrysostomos Rampidis and Charalampos Evagelatos, 2019. All rights reserved. For questions or additional information, 
+      a.a2(href='mailto:alallyouneed@gmail.com') contact us
+  script.
+    function geterror(){
+      var str=window.location.href;
+      var pos = str.search("createauction");
+      var res = str.substring(pos+13);
+      if(res=="?success=false/reason=endsbeforestarts"){
+        return "You set an end start date later than the end date !";
+      }
+      else if(res=="?success=false/reason=invalidname"){
+        return "The name you entered is invalid!";
+      }
+      else if(res=="?success=true=false/reason=buylessthanstarting"){
+        return "You set a buy now price lower that the sarting bid !";
+      }
+      else if(res=="?success=true"){
+        return "Auction created!";
+      }
+      return "";
+    }
+    document.getElementById("error_crau").textContent = geterror();
+    if(document.getElementById("error_crau").textContent=="Auction created!"){
+      document.getElementById("error_crau").style.backgroundColor = "#00e65c";
+    }
+  script(type='text/javascript').
+    var loadFile=function(event){
+      
+      var image=document.getElementById('fill');
+      image.src=URL.createObjectURL(event.target.files[0]);
+      if(event.target.files.length>1){
+        var image2=document.getElementById('fill2');
+        image2.src=URL.createObjectURL(event.target.files[1]);
+      }
+      if(event.target.files.length>2){
+        var image3=document.getElementById('fill3');
+        image3.src=URL.createObjectURL(event.target.files[2]);
+      }
+      if(event.target.files.length>3){
+        var image4=document.getElementById('fill4');
+        image4.src=URL.createObjectURL(event.target.files[3]);
+      }
+    }
+    
+  script(type='text/javascript').
+    function clear(){
+      alert("hi");
+      var image=document.getElementById('fill');
+      image.src="#";
+      alert(document.getElementById('fill').src);
+      var image2=document.getElementById('fill2');
+      image2.src="#";
+      var image3=document.getElementById('fill3');
+      image3.src="#";
+      var image4=document.getElementById('fill4');
+      image4.src="#";
+    }

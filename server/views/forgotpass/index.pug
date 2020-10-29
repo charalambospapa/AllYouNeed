@@ -1,0 +1,26 @@
+extends ../layout/index.pug
+
+block content
+  .innerbody
+    .spacer
+    .auction
+      .col-left
+        .login
+          h4 Recover Password
+          .error#error_login
+            |
+          form.login-form(action="/forgotpass",method="POST")
+            .form-group
+              label
+                input(type='email' placeholder='Email',name="email",required=true)
+            br
+            button.btn.btn-default.pull-right(type='submit') ⏎
+  .footer
+    span
+      a.a1(href='/TOS') TERMS OF SERVICE
+    span
+      a.a1(href='/aboutus') OUR TEAM
+    br
+    span
+      | Created by Charalampos Papa, Chrysostomos Rampidis and Charalampos Evagelatos, 2019. All rights reserved. For questions or additional information, 
+      a.a2(href='mailto:alallyouneed@gmail.com') contact us
